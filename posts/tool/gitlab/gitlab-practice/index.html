@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/16.png?v=7.3.0">
+  <link rel="mask-icon" href="/32.png?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false,"width":240},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="本文阐述了一个完整的通过gitlab进行软件开发的实践方案">
+<meta name="keywords" content="Gitlab,git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gitlab实践方案">
+<meta property="og:url" content="https://blog.mapleque.com/posts/tool/gitlab/gitlab-practice/index.html">
+<meta property="og:site_name" content="枫枝雀自鸣">
+<meta property="og:description" content="本文阐述了一个完整的通过gitlab进行软件开发的实践方案">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-26T04:25:47.195Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="gitlab实践方案">
+<meta name="twitter:description" content="本文阐述了一个完整的通过gitlab进行软件开发的实践方案">
+  <link rel="alternate" href="/atom.xml" title="枫枝雀自鸣" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.mapleque.com/posts/tool/gitlab/gitlab-practice/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>gitlab实践方案 | 枫枝雀自鸣</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e0fc945f04e1f73b09770bf9d28d0627";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <!--<span class="logo-line-before"><i></i></span>-->
+        <span class="site-title">枫枝雀自鸣</span>
+        <!--<span class="logo-line-after"><i></i></span>-->
+      </a>
+    </div>
+        <p class="site-subtitle">技术博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a class="book-mark-link book-mark-link-fixed" href="#"></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://blog.mapleque.com/posts/tool/gitlab/gitlab-practice/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="枫雀">
+      <meta itemprop="description" content="技术经验积累。">
+      <meta itemprop="image" content="/500.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="枫枝雀自鸣">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">gitlab实践方案
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-28 19:19:11" itemprop="dateCreated datePublished" datetime="2019-08-28T19:19:11+08:00">2019-08-28</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-26 12:25:47" itemprop="dateModified" datetime="2020-02-26T12:25:47+08:00">2020-02-26</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">工具</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tool/gitlab/" itemprop="url" rel="index"><span itemprop="name">Gitlab</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <div class="post-description">本文阐述了一个完整的通过gitlab进行软件开发的实践方案</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文提供一种基于gitlab进行团队项目开发发的解决方案。</p>
+<p>目前有两个途径可以使用gitlab:</p>
+<ol>
+<li>直接使用<a href="https://gitlab.com" target="_blank" rel="noopener">gitlab.com</a>官方提供的服务，个人项目免费，创建团队收费。</li>
+<li>基于开源协议，自行搭建gitlab服务。方法请参考<a href="https://about.gitlab.com/installation/" target="_blank" rel="noopener">官方教程</a></li>
+</ol>
+<h1 id="用户和权限管理"><a class="markdownIt-Anchor" href="#用户和权限管理"></a> 用户和权限管理</h1>
+<p>通常，对于一个项目团队，成员应该有如下角色，（括号中是对应的gitalb角色）：</p>
+<ul>
+<li>项目负责人（master）：负责项目部署发布和持续集成----通常是开发组长</li>
+<li>项目开发者（developer）：负责项目开发维护----通常是做这个项目的开发人员</li>
+<li>其他相关开发者（reporter）：浏览项目代码----通常是不做这个项目的开发人员，例如后端项目对应的前端开发</li>
+<li>其他相关人员（guest）：浏览编辑issue，浏览wiki，获取artifacts等----包括产品、测试等</li>
+</ul>
+<p>对于用户管理，通常需要面对下面问题：</p>
+<ul>
+<li>如何创建删除用户?<br>
+建议使用gitlab自身账户系统管理账户数据。可通过使用gitlab-api同步企业oa数据。<br>
+gitlab账户存在与否，应该完全由管理员负责，该管理员通常身份是运维负责人。</li>
+<li>如何管理账户权限?<br>
+建议通过项目和组来管理用户权限。<br>
+对于一个新账户，默认不属于任何项目和组。<br>
+项目负责人和组负责人在需要时，将目标用户添加删除到所负责的项目或组中。</li>
+</ul>
+<h1 id="项目管理"><a class="markdownIt-Anchor" href="#项目管理"></a> 项目管理</h1>
+<p>所有项目都应该属于一个项目组，并且只能由项目组负责人创建项目。</p>
+<div class="note warning">
+            <p>这里不建议在公司git上创建个人项目，一方面会增加代码管理复杂度，另一方面团队项目的个人分支完全可以做到想做的事情。</p>
+          </div>
+<h2 id="repository"><a class="markdownIt-Anchor" href="#repository"></a> repository</h2>
+<p>创建项目时，应遵循以下原则：</p>
+<ul>
+<li>项目由项目负责人创建</li>
+<li>项目命名空间应该是组而非个人</li>
+<li>项目可见级别选择Internal</li>
+<li>项目描述不要留空，尽量做到简明扼要</li>
+<li><a href="http://xn--README-h18i797heob97vkwekrfjq9d6f8dj00a.md" target="_blank" rel="noopener">项目应当有描述文件README.md</a></li>
+</ul>
+<p>README.md格式建议</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;项目名称&gt;</span><br><span class="line">====</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;项目背景和功能描述...&gt;</span><br><span class="line"></span><br><span class="line">使用手册或接口文档</span><br><span class="line">----</span><br><span class="line">&lt;主要是项目的功能和用法。可链接到wiki&gt;</span><br><span class="line"></span><br><span class="line">开发者文档</span><br><span class="line">----</span><br><span class="line">&lt;包括项目结构说明，开发要求和注意事项，开发环境部署等。可链接到wiki&gt;</span><br><span class="line"></span><br><span class="line">内部依赖</span><br><span class="line">----</span><br><span class="line">&lt;依赖的数据，服务，代码库等&gt;</span><br><span class="line"></span><br><span class="line">外部依赖</span><br><span class="line">----</span><br><span class="line">&lt;依赖的数据，服务，代码库等&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="branch"><a class="markdownIt-Anchor" href="#branch"></a> branch</h2>
+<p>对于规模较小的团队项目，建议使用简化模式进行分支管理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">                1.0.1               1.0.2</span><br><span class="line">master -----------+-------------------+----</span><br><span class="line">        |         |                   |</span><br><span class="line">develop +--------+-----------------+-+-----</span><br><span class="line">            |    |  |         |    | |</span><br><span class="line">    dev/xx1 +----+  | dev/xx3 +----+ |</span><br><span class="line">            dev/xx2 +----------------+</span><br></pre></td></tr></table></figure>
+<p>首先，对于任意项目，都创建两个保护分支：</p>
+<ul>
+<li>master: 只有发布才合并到该分支</li>
+<li>develop: 有新的变化并测试通过后合并到该分支</li>
+</ul>
+<p>开发者通过提交MR将<code>dev/xxx</code>合并到develop分支上，项目负责人根据需要对develop分支进行发布。</p>
+<p>当团队规模到达一定程度时，使用git flow模式进行分支管理会带来很大的方便。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">       1.0.0             1.0.1              1.1.0             1.1.1              1.2.0</span><br><span class="line">master --------------------+------------------+-----------------+------------------+----</span><br><span class="line">         |            |    |                  |            |    |                  |</span><br><span class="line">         | hotfix/xx1 +----+                  | hotfix/xx2 +----+                  |</span><br><span class="line">         |                 | release/xx1 +----+                 | release/xx2 +----+</span><br><span class="line">         |                 |             |    |                 |             |    |</span><br><span class="line">develop  +-----------------+-----------+------+-----------------+--+----+----------+----</span><br><span class="line">             |                |        |                      |    |    |</span><br><span class="line">             |    feature/xx2 +--------+         feature/xxx3 +----+    |</span><br><span class="line"> feature/xx1 +----------------------------------------------------------+</span><br></pre></td></tr></table></figure>
+<h2 id="commit"><a class="markdownIt-Anchor" href="#commit"></a> commit</h2>
+<p>建议使用message格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;本次提交的标题&gt;</span><br><span class="line"></span><br><span class="line">- &lt;本次提交的内容&gt;</span><br><span class="line">- &lt;本次提交的内容&gt;</span><br><span class="line">- &lt;本次提交的内容&gt;</span><br><span class="line">- &lt;本次提交的内容&gt;</span><br><span class="line"></span><br><span class="line">&lt;本次提交的其他说明&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="ci"><a class="markdownIt-Anchor" href="#ci"></a> ci</h2>
+<p>为了保证项目的敏捷开发和持续集成，建议使用<a href="https://docs.gitlab.com/ee/ci/yaml/" target="_blank" rel="noopener">gitlab-ci</a>功能。</p>
+<ul>
+<li>ci配置中应设置合并到任何分支都触发unittest</li>
+<li>合并到develop和master时触发release（可配合ci产生atrifacts用于部署发布）</li>
+</ul>
+<h2 id="issue"><a class="markdownIt-Anchor" href="#issue"></a> issue</h2>
+<p>建议使用gitlab的issue推动项目开发。</p>
+<p>开发者要解决对应的issue可以通过create merge request按钮（新版本gitlab支持）创建branch和merge request，这样方便项目负责人跟踪项目进度。</p>
+<h2 id="wiki"><a class="markdownIt-Anchor" href="#wiki"></a> wiki</h2>
+<p>建议写项目开发相关内容。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>枫雀</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.mapleque.com/posts/tool/gitlab/gitlab-practice/" title="gitlab实践方案">https://blog.mapleque.com/posts/tool/gitlab/gitlab-practice/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Gitlab/" rel="tag"><i class="fa fa-tag"></i> Gitlab</a>
+            
+              <a href="/tags/git/" rel="tag"><i class="fa fa-tag"></i> git</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/posts/tool/hexo/hexo-type-setting/" rel="next" title="Hexo排版">
+                  <i class="fa fa-chevron-left"></i> Hexo排版
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/posts/tool/openswan/l2tp/" rel="prev" title="使用openswan搭建l2tp/ipsec服务">
+                  使用openswan搭建l2tp/ipsec服务 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#用户和权限管理"><span class="nav-number">1.</span> <span class="nav-text"> 用户和权限管理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#项目管理"><span class="nav-number">2.</span> <span class="nav-text"> 项目管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#repository"><span class="nav-number">2.1.</span> <span class="nav-text"> repository</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#branch"><span class="nav-number">2.2.</span> <span class="nav-text"> branch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#commit"><span class="nav-number">2.3.</span> <span class="nav-text"> commit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ci"><span class="nav-number">2.4.</span> <span class="nav-text"> ci</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#issue"><span class="nav-number">2.5.</span> <span class="nav-text"> issue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wiki"><span class="nav-number">2.6.</span> <span class="nav-text"> wiki</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/500.png"
+      alt="枫雀">
+  <p class="site-author-name" itemprop="name">枫雀</p>
+  <div class="site-description" itemprop="description">技术经验积累。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/mapleque" title="GitHub &rarr; https://github.com/mapleque" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:mapleque@163.com" title="E-Mail &rarr; mailto:mapleque@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+<a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">京ICP备16041918号 </a>
+  <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=" rel="noopener" target="_blank"> </a>&copy; 2013 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mapleque.com</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+<script src="/js/next-boot.js?v=7.3.0"></script><script src="/js/bookmark.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/viz.js/1.7.1/viz.js'></script>
+  <script>
+    String.prototype.replaceAll = function(search, replacement) {
+      var target = this;
+      return target.split(search).join(replacement);
+    };
+
+    let vizObjects = document.querySelectorAll('.graphviz')
+
+    for (let item of vizObjects) {
+      let svg = undefined
+      try {
+        svg = Viz(item.textContent.replaceAll('–', '--'), 'svg')
+      } catch(e) {
+        svg = `<pre class="error">${e}</pre>`
+      }
+      item.outerHTML = svg
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

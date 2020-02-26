@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/16.png?v=7.3.0">
+  <link rel="mask-icon" href="/32.png?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false,"width":240},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="每个开发者，都有一个套适合自己的开发环境，如果你决定开始使用go语言开发，那么一定要先准备好自己的开发环境。              这里所指的开发环境，不只是一个能让go跑起来的环境，而是一个可以用于日常工作的完整的工作环境。            本文将从三个方面介绍go语言开发环境的构建，并给出自己所构建的开发环境的配置：  go安装和升级 – go运行的基础 路径和环境变量 – 更好地管">
+<meta name="keywords" content="golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【开始用go】在MacOS上搭建开发环境">
+<meta property="og:url" content="https://blog.mapleque.com/posts/practice/go/go-workspace/index.html">
+<meta property="og:site_name" content="枫枝雀自鸣">
+<meta property="og:description" content="每个开发者，都有一个套适合自己的开发环境，如果你决定开始使用go语言开发，那么一定要先准备好自己的开发环境。              这里所指的开发环境，不只是一个能让go跑起来的环境，而是一个可以用于日常工作的完整的工作环境。            本文将从三个方面介绍go语言开发环境的构建，并给出自己所构建的开发环境的配置：  go安装和升级 – go运行的基础 路径和环境变量 – 更好地管">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-26T04:25:47.196Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【开始用go】在MacOS上搭建开发环境">
+<meta name="twitter:description" content="每个开发者，都有一个套适合自己的开发环境，如果你决定开始使用go语言开发，那么一定要先准备好自己的开发环境。              这里所指的开发环境，不只是一个能让go跑起来的环境，而是一个可以用于日常工作的完整的工作环境。            本文将从三个方面介绍go语言开发环境的构建，并给出自己所构建的开发环境的配置：  go安装和升级 – go运行的基础 路径和环境变量 – 更好地管">
+  <link rel="alternate" href="/atom.xml" title="枫枝雀自鸣" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.mapleque.com/posts/practice/go/go-workspace/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>【开始用go】在MacOS上搭建开发环境 | 枫枝雀自鸣</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e0fc945f04e1f73b09770bf9d28d0627";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <!--<span class="logo-line-before"><i></i></span>-->
+        <span class="site-title">枫枝雀自鸣</span>
+        <!--<span class="logo-line-after"><i></i></span>-->
+      </a>
+    </div>
+        <p class="site-subtitle">技术博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a class="book-mark-link book-mark-link-fixed" href="#"></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://blog.mapleque.com/posts/practice/go/go-workspace/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="枫雀">
+      <meta itemprop="description" content="技术经验积累。">
+      <meta itemprop="image" content="/500.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="枫枝雀自鸣">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">【开始用go】在MacOS上搭建开发环境
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-06 18:33:45" itemprop="dateCreated datePublished" datetime="2019-09-06T18:33:45+08:00">2019-09-06</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-26 12:25:47" itemprop="dateModified" datetime="2020-02-26T12:25:47+08:00">2020-02-26</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/practice/" itemprop="url" rel="index"><span itemprop="name">实践</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/practice/go/" itemprop="url" rel="index"><span itemprop="name">开始用go</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>每个开发者，都有一个套适合自己的开发环境，如果你决定开始使用go语言开发，那么一定要先准备好自己的开发环境。</p>
+<div class="note info">
+            <p>这里所指的开发环境，不只是一个能让go跑起来的环境，而是一个可以用于日常工作的完整的工作环境。</p>
+          </div>
+<p>本文将从三个方面介绍go语言开发环境的构建，并给出自己所构建的开发环境的配置：</p>
+<ul>
+<li>go安装和升级 – go运行的基础</li>
+<li>路径和环境变量 – 更好地管理项目、依赖，并方便执行使用go安装的命令行工具</li>
+<li>IDE – 一个个人熟悉的用于写go代码的编辑器</li>
+</ul>
+<a id="more"></a>
+<h1 id="go安装和升级"><a class="markdownIt-Anchor" href="#go安装和升级"></a> go安装和升级</h1>
+<div class="note info">
+            <p>Go官方提供了详细的安装文档 <a href="https://go-zh.org/doc/install" target="_blank" rel="noopener">https://go-zh.org/doc/install</a> ，读者可以按需索取。<br>这里将要介绍的是在MacOS下，使用homebrew安装并管理Go的详细方法。</p>
+          </div>
+<p>Homebrew是一个面向MacOS的包管理工具，官网 <a href="https://brew.sh/" target="_blank" rel="noopener">https://brew.sh/</a> 有详细安装使用方法说明。</p>
+<p>在国内使用Homebrew，建议更改源：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> <span class="string">"<span class="variable">$(brew --repo)</span>"</span></span><br><span class="line">git remote <span class="built_in">set</span>-url origin https://mirrors.ustc.edu.cn/brew.git </span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> <span class="string">"<span class="variable">$(brew --repo)</span>/Library/Taps/homebrew/homebrew-core"</span></span><br><span class="line">git remote <span class="built_in">set</span>-url origin https://mirrors.ustc.edu.cn/homebrew-core.git </span><br><span class="line"></span><br><span class="line">brew update</span><br></pre></td></tr></table></figure>
+<p>查看可用的Go版本：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew search go</span><br></pre></td></tr></table></figure>
+<p>这里将可以看到一系列可以安装的Go版本：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go go@1.10 go@1.9 go@1.8 go@1.4</span><br></pre></td></tr></table></figure>
+<p>通常直接安装最新版本即可：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install go</span><br></pre></td></tr></table></figure>
+<p>安装完成后，即可在命令行执行go命令了：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go version</span><br></pre></td></tr></table></figure>
+<p>当go更新了新版本，需要升级的时候，执行：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew upgrade go</span><br></pre></td></tr></table></figure>
+<p>这个命令将安装Homebrew所管理的最新版本的go，并替换掉原来安装的go。</p>
+<h1 id="路径和环境变量"><a class="markdownIt-Anchor" href="#路径和环境变量"></a> 路径和环境变量</h1>
+<p>安装完Go后，就可以开始写代码了。但是如果想要写项目，还需要更进一步的进行配置。</p>
+<div class="note info">
+            <p>官方文档参考： <a href="https://go-zh.org/doc/code.html" target="_blank" rel="noopener">https://go-zh.org/doc/code.html</a> 。</p>
+          </div>
+<p>这里笔者给出自己在MacOS上的路径：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">~/</span><br><span class="line">├── workspace -&gt; Documents/workspace</span><br><span class="line">│   ├── gopath</span><br><span class="line">│   │   ├── bin</span><br><span class="line">│   │   ├── pkg</span><br><span class="line">│   │   ├── src</span><br><span class="line">│   │   │   ├── github.com</span><br><span class="line">│   │   │   │   ├── mapleque</span><br><span class="line">│   │   │   │   │   ├── gostart</span><br><span class="line">│   │   │   ├── golang.org</span><br><span class="line">│   │   │   │   ├── x</span><br><span class="line">│   │   │   │   │   ├── tour</span><br><span class="line">│   ├── github.com</span><br><span class="line">│   │   ├── mapleque</span><br><span class="line">│   │   │   ├── gostart -&gt; ~/workspace/gopath/src/github.com/mapleque/gostart</span><br></pre></td></tr></table></figure>
+<p>设置环境变量：</p>
+<figure class="highlight bash"><figcaption><span>~/.bash_profile</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> GOPATH=~/workspace/gopath</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$GOPATH</span>/bin</span><br></pre></td></tr></table></figure>
+<p>其中，</p>
+<ul>
+<li>GOPROXY 用于<code>go get</code>时作为代理</li>
+<li>GOAPTH 用于原始的go依赖路径</li>
+<li>PATH 中增加 $GOPATH/bin 是为了让<code>go install</code>所安装的二进制文件能够直接被执行</li>
+</ul>
+<p>特别的，从go1.11版本开始，Go将go module作为官方包管理工具进行支持，其中go1.11和go1.12版本需要主动开启：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> GO111MODULE=on</span><br><span class="line"><span class="built_in">export</span> GOPROXY=https://goproxy.cn</span><br></pre></td></tr></table></figure>
+<p>其中，</p>
+<ul>
+<li>GOPROXY 用于<code>go get</code>时自动代理使用国内源</li>
+</ul>
+<div class="note info">
+            <p>关于go module的使用，可以参考官方文档：<a href="https://blog.go-zh.org/using-go-modules" target="_blank" rel="noopener">https://blog.go-zh.org/using-go-modules</a> 。<br>笔者也将在另外一篇文章中详细讲述自己的使用方式，敬请期待。</p>
+          </div>
+<h1 id="编辑器"><a class="markdownIt-Anchor" href="#编辑器"></a> 编辑器</h1>
+<div class="note info">
+            <p>官方推荐编辑器：<a href="https://golang.google.cn/doc/editors.html" target="_blank" rel="noopener">https://golang.google.cn/doc/editors.html</a> 。</p>
+          </div>
+<p>笔者使用的是vim-go。</p>
+<ul>
+<li>如何安装vim-go <a href="https://github.com/fatih/vim-go" target="_blank" rel="noopener">https://github.com/fatih/vim-go</a></li>
+<li><a href="/posts/tool/vim/vim-diy/">如何安装vundle并配置vim</a></li>
+<li>如何安装vim – <code>brew install vim</code></li>
+</ul>
+<p>更多关于vim的配置，可以参考<a href="/posts/tool/vim/vim-go/">【vim】使用vim作为开发go的IDE</a>。</p>
+<div class="note warning">
+            <p>注意：最新版本vim-go由于使用了gopls，所以如果使用的是vim-go的最新版本，在执行<code>:GoInstallBanaries</code>命令时，必须开启go module模式，并且在当前文件夹中有go.mod文件。</p>
+          </div>
+<p>这里特别提一些值得一试vim-go命令：</p>
+<ul>
+<li><code>:GoDef, :GoDefPop</code>或者<code>Ctrl+], Ctrl+t</code> – 直接跳转到光标位置所指的方法或变量的定义代码</li>
+<li><code>:GoAddTags, :GoRemoveTags</code> – 给当前光标所在属性添加删除标签</li>
+<li><code>:GoMetaLinter</code> – 执行一系列代码检查</li>
+<li><code>:GoImpl</code> – 生成实现指定接口的代码</li>
+<li><code>:GoIfErr</code> – 生成错误校验的代码</li>
+<li><code>:GoImports</code> – 自动增减需要import的包</li>
+</ul>
+<p>本质上讲，上面的命令都是通过调用一些go tool来实现。</p>
+<div class="note info">
+            <p>Go有着众多的tool，它们几乎覆盖了从代码编写、编译测试运行、到性能监控等整个开发周期。<br>笔者在后面的文章中，也会选择性的介绍一些tool的实战，以启发读者如何利用好这些资源来更高效的工作。</p>
+          </div>
+
+    </div>
+
+    
+    
+    
+        
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>枫雀</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.mapleque.com/posts/practice/go/go-workspace/" title="【开始用go】在MacOS上搭建开发环境">https://blog.mapleque.com/posts/practice/go/go-workspace/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/golang/" rel="tag"><i class="fa fa-tag"></i> golang</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/posts/practice/go/go-start/" rel="next" title="【开始用go】从零开始">
+                  <i class="fa fa-chevron-left"></i> 【开始用go】从零开始
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/posts/practice/go/go-http/" rel="prev" title="【开始用go】开发HTTP服务">
+                  【开始用go】开发HTTP服务 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#go安装和升级"><span class="nav-number">1.</span> <span class="nav-text"> go安装和升级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#路径和环境变量"><span class="nav-number">2.</span> <span class="nav-text"> 路径和环境变量</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编辑器"><span class="nav-number">3.</span> <span class="nav-text"> 编辑器</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/500.png"
+      alt="枫雀">
+  <p class="site-author-name" itemprop="name">枫雀</p>
+  <div class="site-description" itemprop="description">技术经验积累。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/mapleque" title="GitHub &rarr; https://github.com/mapleque" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:mapleque@163.com" title="E-Mail &rarr; mailto:mapleque@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+<a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">京ICP备16041918号 </a>
+  <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=" rel="noopener" target="_blank"> </a>&copy; 2013 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mapleque.com</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+<script src="/js/next-boot.js?v=7.3.0"></script><script src="/js/bookmark.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/viz.js/1.7.1/viz.js'></script>
+  <script>
+    String.prototype.replaceAll = function(search, replacement) {
+      var target = this;
+      return target.split(search).join(replacement);
+    };
+
+    let vizObjects = document.querySelectorAll('.graphviz')
+
+    for (let item of vizObjects) {
+      let svg = undefined
+      try {
+        svg = Viz(item.textContent.replaceAll('–', '--'), 'svg')
+      } catch(e) {
+        svg = `<pre class="error">${e}</pre>`
+      }
+      item.outerHTML = svg
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

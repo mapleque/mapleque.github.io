@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/16.png?v=7.3.0">
+  <link rel="mask-icon" href="/32.png?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false,"width":240},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="本文提供了一套使用openvpn管理办公网络的方案，兼顾安全性和便捷性">
+<meta name="keywords" content="vpn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用openvpn管理办公网络">
+<meta property="og:url" content="https://blog.mapleque.com/posts/tool/openvpn/openvpn/index.html">
+<meta property="og:site_name" content="枫枝雀自鸣">
+<meta property="og:description" content="本文提供了一套使用openvpn管理办公网络的方案，兼顾安全性和便捷性">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-26T04:25:47.198Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用openvpn管理办公网络">
+<meta name="twitter:description" content="本文提供了一套使用openvpn管理办公网络的方案，兼顾安全性和便捷性">
+  <link rel="alternate" href="/atom.xml" title="枫枝雀自鸣" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.mapleque.com/posts/tool/openvpn/openvpn/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>使用openvpn管理办公网络 | 枫枝雀自鸣</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e0fc945f04e1f73b09770bf9d28d0627";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <!--<span class="logo-line-before"><i></i></span>-->
+        <span class="site-title">枫枝雀自鸣</span>
+        <!--<span class="logo-line-after"><i></i></span>-->
+      </a>
+    </div>
+        <p class="site-subtitle">技术博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a class="book-mark-link book-mark-link-fixed" href="#"></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://blog.mapleque.com/posts/tool/openvpn/openvpn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="枫雀">
+      <meta itemprop="description" content="技术经验积累。">
+      <meta itemprop="image" content="/500.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="枫枝雀自鸣">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">使用openvpn管理办公网络
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-29 15:06:23" itemprop="dateCreated datePublished" datetime="2019-08-29T15:06:23+08:00">2019-08-29</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-26 12:25:47" itemprop="dateModified" datetime="2020-02-26T12:25:47+08:00">2020-02-26</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">工具</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tool/openvpn/" itemprop="url" rel="index"><span itemprop="name">openvpn</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <div class="post-description">本文提供了一套使用openvpn管理办公网络的方案，兼顾安全性和便捷性</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>使用openvpn管理办公网络，可以做到：</p>
+<ul>
+<li>以证书作为客户端认证标识，通过颁发证书管理用户接入网络的权限</li>
+<li>每个证书指定固定ip，在网络上可以监控ip行为，对应到用户</li>
+<li>通过对用户分配不同ip段的ip，来控制用户在网络中的权限</li>
+<li>推送内网域名解析，复杂内网路由保证复杂内网连通性</li>
+</ul>
+<h1 id="服务端"><a class="markdownIt-Anchor" href="#服务端"></a> 服务端</h1>
+<h2 id="主服务"><a class="markdownIt-Anchor" href="#主服务"></a> 主服务</h2>
+<ul>
+<li><a href="https://github.com/OpenVPN/openvpn" target="_blank" rel="noopener">github.com/OpenVPN/openvpn</a></li>
+<li><a href="https://openvpn.net/community-resources/how-to/" target="_blank" rel="noopener">官网文档openvpn.net</a>(需要翻墙)</li>
+<li><a href="https://github.com/Nyr/openvpn-install" target="_blank" rel="noopener">一键安装脚本</a></li>
+</ul>
+<p>配置文件样例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">verb 3 # LOG等级</span><br><span class="line">dev tun  # 隧道设备名</span><br><span class="line">port 1194</span><br><span class="line"></span><br><span class="line"># 如果上层使用udp, vpn使用tcp, 丢包后vpn会就会重传上层的udp报文, vpn使用udp协议, 这样可以让上层应用自己决定使用tcp还是udp</span><br><span class="line">proto udp</span><br><span class="line"></span><br><span class="line">topology subnet # 此模式下所有客户端在一个子网里</span><br><span class="line"></span><br><span class="line"># keys</span><br><span class="line">ca /etc/openvpn/pki/ca.crt</span><br><span class="line">key /etc/openvpn/pki/private/vpn.mapleque.com.key</span><br><span class="line">cert /etc/openvpn/pki/issued/vpn.mapleque.com.crt</span><br><span class="line">crl-verify /etc/openvpn/pki/crl.pem</span><br><span class="line">dh /etc/openvpn/pki/dh.pem</span><br><span class="line">tls-auth /etc/openvpn/pki/ta.key</span><br><span class="line"></span><br><span class="line">key-direction 0</span><br><span class="line">keepalive 10 60</span><br><span class="line"></span><br><span class="line"># 超时重连接时不会重载key和tun</span><br><span class="line">persist-key</span><br><span class="line">persist-tun</span><br><span class="line"></span><br><span class="line">status /var/log/openvpn/status.log</span><br><span class="line">log /var/log/openvpn/log.log</span><br><span class="line">management localhost 7505</span><br><span class="line"></span><br><span class="line">client-config-dir /etc/openvpn/ccd</span><br><span class="line"></span><br><span class="line">client-to-client # 允许client之间通信</span><br><span class="line"></span><br><span class="line">user vpn</span><br><span class="line">group vpn</span><br><span class="line"></span><br><span class="line"># vpn进程启动后给本机添加该路由(不需要有客户端连接), 可以配置多条</span><br><span class="line">route 172.31.0.0 255.255.0.0 192.168.232.20</span><br><span class="line"></span><br><span class="line"># 启动server模式, 隧道使用该网段, 并占用第一个地址用作本机隧道的IP, nopool表示不将此网段用作dhcp</span><br><span class="line">server 192.168.224.0 255.255.240.0 nopool</span><br><span class="line"></span><br><span class="line"># 单独配置dhcp pool</span><br><span class="line">ifconfig-pool 192.168.224.2 192.168.225.254 255.255.240.0</span><br><span class="line"></span><br><span class="line">push &quot;dhcp-option DNS 192.168.224.1&quot;</span><br><span class="line"></span><br><span class="line">push &quot;route 192.168.16.0 255.255.240.0 vpn_gateway&quot;</span><br></pre></td></tr></table></figure>
+<p>systemd启动配置样例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># This service is actually a systemd target,</span><br><span class="line"># but we are using a service since targets cannot be reloaded.</span><br><span class="line"># /lib/systemd/system/openvpn.service</span><br><span class="line"></span><br><span class="line">[Unit]</span><br><span class="line">Description=OpenVPN service</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=forking</span><br><span class="line">ExecStart=/usr/sbin/openvpn --daemon ovpn --cd /etc/openvpn --config /etc/openvpn/vpn.conf</span><br><span class="line">ExecReload=/bin/kill -HUP $MAINPID</span><br><span class="line">WorkingDirectory=/etc/openvpn</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
+<h2 id="证书颁发"><a class="markdownIt-Anchor" href="#证书颁发"></a> 证书颁发</h2>
+<p>可以考虑使用easyrsa签发证书。</p>
+<h1 id="客户端"><a class="markdownIt-Anchor" href="#客户端"></a> 客户端</h1>
+<p>安装vpn客户端有风险，注意看好官方客户端版本。大部分客户端下载都需要翻墙，请自行检索解决方案。</p>
+<ul>
+<li><a href="https://itunes.apple.com/us/app/openvpn-connect/id590379981?mt=8" target="_blank" rel="noopener">IOS</a></li>
+<li><a href="https://play.google.com/store/apps/details?id=net.openvpn.openvpn" target="_blank" rel="noopener">Android</a></li>
+<li><a href="https://openvpn.net/downloads/openvpn-connect-v3-macos.dmg" target="_blank" rel="noopener">MacOS</a></li>
+<li><a href="https://openvpn.net/vpn-server-resources/connecting-to-access-server-with-linux/" target="_blank" rel="noopener">Linux</a></li>
+<li><a href="https://openvpn.net/downloads/openvpn-connect-v3-windows.msi" target="_blank" rel="noopener">Windows</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>枫雀</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.mapleque.com/posts/tool/openvpn/openvpn/" title="使用openvpn管理办公网络">https://blog.mapleque.com/posts/tool/openvpn/openvpn/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/vpn/" rel="tag"><i class="fa fa-tag"></i> vpn</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/posts/practice/admin/admin/" rel="next" title="通用后台实现方案">
+                  <i class="fa fa-chevron-left"></i> 通用后台实现方案
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/posts/practice/auth/kerberos/" rel="prev" title="基于Kerberos实现内部系统员工账号单点登录">
+                  基于Kerberos实现内部系统员工账号单点登录 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#服务端"><span class="nav-number">1.</span> <span class="nav-text"> 服务端</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#主服务"><span class="nav-number">1.1.</span> <span class="nav-text"> 主服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#证书颁发"><span class="nav-number">1.2.</span> <span class="nav-text"> 证书颁发</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#客户端"><span class="nav-number">2.</span> <span class="nav-text"> 客户端</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/500.png"
+      alt="枫雀">
+  <p class="site-author-name" itemprop="name">枫雀</p>
+  <div class="site-description" itemprop="description">技术经验积累。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/mapleque" title="GitHub &rarr; https://github.com/mapleque" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:mapleque@163.com" title="E-Mail &rarr; mailto:mapleque@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+<a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">京ICP备16041918号 </a>
+  <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=" rel="noopener" target="_blank"> </a>&copy; 2013 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mapleque.com</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+<script src="/js/next-boot.js?v=7.3.0"></script><script src="/js/bookmark.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/viz.js/1.7.1/viz.js'></script>
+  <script>
+    String.prototype.replaceAll = function(search, replacement) {
+      var target = this;
+      return target.split(search).join(replacement);
+    };
+
+    let vizObjects = document.querySelectorAll('.graphviz')
+
+    for (let item of vizObjects) {
+      let svg = undefined
+      try {
+        svg = Viz(item.textContent.replaceAll('–', '--'), 'svg')
+      } catch(e) {
+        svg = `<pre class="error">${e}</pre>`
+      }
+      item.outerHTML = svg
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

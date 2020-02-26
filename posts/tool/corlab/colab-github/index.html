@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/16.png?v=7.3.0">
+  <link rel="mask-icon" href="/32.png?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false,"width":240},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="在colab上开发并运行神经网络相关任务，并将代码托管到github上。">
+<meta name="keywords" content="nn,pytorch,colab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用google的colab进行神经网络相关开发">
+<meta property="og:url" content="https://blog.mapleque.com/posts/tool/corlab/colab-github/index.html">
+<meta property="og:site_name" content="枫枝雀自鸣">
+<meta property="og:description" content="在colab上开发并运行神经网络相关任务，并将代码托管到github上。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-26T04:25:47.194Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用google的colab进行神经网络相关开发">
+<meta name="twitter:description" content="在colab上开发并运行神经网络相关任务，并将代码托管到github上。">
+  <link rel="alternate" href="/atom.xml" title="枫枝雀自鸣" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.mapleque.com/posts/tool/corlab/colab-github/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>使用google的colab进行神经网络相关开发 | 枫枝雀自鸣</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e0fc945f04e1f73b09770bf9d28d0627";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <!--<span class="logo-line-before"><i></i></span>-->
+        <span class="site-title">枫枝雀自鸣</span>
+        <!--<span class="logo-line-after"><i></i></span>-->
+      </a>
+    </div>
+        <p class="site-subtitle">技术博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a class="book-mark-link book-mark-link-fixed" href="#"></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://blog.mapleque.com/posts/tool/corlab/colab-github/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="枫雀">
+      <meta itemprop="description" content="技术经验积累。">
+      <meta itemprop="image" content="/500.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="枫枝雀自鸣">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">使用google的colab进行神经网络相关开发
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-31 16:07:21" itemprop="dateCreated datePublished" datetime="2019-10-31T16:07:21+08:00">2019-10-31</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-26 12:25:47" itemprop="dateModified" datetime="2020-02-26T12:25:47+08:00">2020-02-26</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tool/" itemprop="url" rel="index"><span itemprop="name">工具</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tool/corlab/" itemprop="url" rel="index"><span itemprop="name">corlab</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <div class="post-description">在colab上开发并运行神经网络相关任务，并将代码托管到github上。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a href="https://colab.research.google.com/" target="_blank" rel="noopener">Colaboratory(简称colab)</a>是Google提供的一个免费的Jupyter笔记本环境，支持云端运行。<br>
+为了支持云端运行，Google还提供了强大的计算资源，如GPU、TPU和云端存储空间等，这些都可以通过浏览器免费使用。</p>
+<p>如需全面了解colab的所提供的功能，请阅读<a href="https://colab.research.google.com/notebooks/welcome.ipynb" target="_blank" rel="noopener">官方文档</a>。</p>
+<p>本文的主要目标是使你快速的能够使用colab进行神经网络相关开发。</p>
+<h2 id="准备"><a class="markdownIt-Anchor" href="#准备"></a> 准备</h2>
+<p>使用colab服务，首先需要科学上网。相关文章，请参考<a href="https://blog.mapleque.com/tags/vpn/">标签：vpn</a>中的内容。</p>
+<h2 id="创建修改文件"><a class="markdownIt-Anchor" href="#创建修改文件"></a> 创建修改文件</h2>
+<p>直接访问地址： <a href="https://colab.research.google.com/" target="_blank" rel="noopener">https://colab.research.google.com/</a> ，就可以开始代码的编辑。</p>
+<p>打开页面时，会弹窗提示最近打开的文件，也可以选择创建文件。这个弹窗后面也可以通过顶部菜单：<code>文件-&gt;打开笔记本</code>调出。</p>
+<p>在这个弹窗中，我们还可以看到一些其他打开文件的方式，这里重点说明GitHub选项。</p>
+<p>点击选择GitHub选项，会出现<code>输入GitHub网址，或者按组织或用户搜索</code>的输入框。这里可以输入自己的github用户名，如：<code>mapleque</code>，点击搜索后，就会在下面代码库部分出现该用户所有的公开项目列表了（中间可能需要进行GitHub账号授权）。选择一个项目和分支，如果在项目中含有colab可以打开的文件，就会被列在下面的路径列表中，用户可以选择任意一个打开编辑。</p>
+<p>如果是私有代码库，可以选择勾选右上角的选项，然后进行额外的授权之后，重新搜索对应的空间或项目，这时所有有权限的私有项目也会出现在列表中了。</p>
+<p>注意：这里还有一个快捷打开GitHub文件的技巧，即输入网址：<a href="https://colab.research.google.com/github/mapleque/nnlearning/blob/master/notebooks/TensorflowMNIST.ipynb" target="_blank" rel="noopener">https://colab.research.google.com/github/mapleque/nnlearning/blob/master/notebooks/TensorflowMNIST.ipynb</a> 。</p>
+<p>观察上面的网址，可以发现<code>/github/</code>后面的路径，实际上就是文件在GitHub上预览的路径。</p>
+<h2 id="编辑运行"><a class="markdownIt-Anchor" href="#编辑运行"></a> 编辑运行</h2>
+<p>colab集成了丰富的nn相关资源，如tensorflow, pytorch等。所以只需要新建一个python3的记事本，就可以开始执行程序了。</p>
+<p>注意，新建代码文件后，需要配置代码执行环境：选择顶部菜单中的<code>代码执行程序-&gt;更改运行时类型</code>选项，在弹框中选择相关设置，如：硬件加速选择GPU，最后保存。</p>
+<p>点击顶部菜单左上角<code>+代码</code>选项，就会在文件编辑区域出现一行带有播放图标的空白输入框，在输入框中输入代码，点击播放按钮，就可以提交执行。例如这里提交编辑代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> absolute_import, division, print_function, unicode_literals</span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow <span class="keyword">import</span> keras</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br></pre></td></tr></table></figure>
+<p>点击执行，即显示执行成功。可见tensorflow，numpy和matplotlib等包都已经预置安装好了。</p>
+<p>后面正常编辑执行MNIST例子相关代码，就可以看到自动下载数据和训练的日志输出。完整代码请参考<a href="https://colab.research.google.com/github/mapleque/nnlearning/blob/master/notebooks/TensorflowMNIST.ipynb" target="_blank" rel="noopener">mapleque/nnlearning/TensorflowMNIST.ipynb</a>。</p>
+<p>colab执行结果页面，可以将图片直接展示出来。</p>
+<h2 id="提交到github"><a class="markdownIt-Anchor" href="#提交到github"></a> 提交到GitHub</h2>
+<p>colab支持直接将当前代码文件提交到GitHub。</p>
+<p>点击顶部菜单：<code>文件-&gt;在GitHub中保存一份副本</code>选项，授权后在弹窗中选择对应的代码库、分支和路径，就可以提交了。</p>
+<p>这里如果勾选了<code>包含指向Colaboratory的链接</code>选项，将会在GitHub的文件预览页面看到一个直接在colab中打开文件并编辑的按钮。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>枫雀</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.mapleque.com/posts/tool/corlab/colab-github/" title="使用google的colab进行神经网络相关开发">https://blog.mapleque.com/posts/tool/corlab/colab-github/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/nn/" rel="tag"><i class="fa fa-tag"></i> nn</a>
+            
+              <a href="/tags/pytorch/" rel="tag"><i class="fa fa-tag"></i> pytorch</a>
+            
+              <a href="/tags/colab/" rel="tag"><i class="fa fa-tag"></i> colab</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/posts/tool/shadowsocks/shadowsocks/" rel="next" title="部署并使用shadowsocks">
+                  <i class="fa fa-chevron-left"></i> 部署并使用shadowsocks
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/posts/practice/0ws/0ws-index/" rel="prev" title="【互联网产品的诞生和演化】目录">
+                  【互联网产品的诞生和演化】目录 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#准备"><span class="nav-number">1.</span> <span class="nav-text"> 准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建修改文件"><span class="nav-number">2.</span> <span class="nav-text"> 创建修改文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑运行"><span class="nav-number">3.</span> <span class="nav-text"> 编辑运行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提交到github"><span class="nav-number">4.</span> <span class="nav-text"> 提交到GitHub</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/500.png"
+      alt="枫雀">
+  <p class="site-author-name" itemprop="name">枫雀</p>
+  <div class="site-description" itemprop="description">技术经验积累。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/mapleque" title="GitHub &rarr; https://github.com/mapleque" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:mapleque@163.com" title="E-Mail &rarr; mailto:mapleque@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+<a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">京ICP备16041918号 </a>
+  <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=" rel="noopener" target="_blank"> </a>&copy; 2013 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mapleque.com</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+<script src="/js/next-boot.js?v=7.3.0"></script><script src="/js/bookmark.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/viz.js/1.7.1/viz.js'></script>
+  <script>
+    String.prototype.replaceAll = function(search, replacement) {
+      var target = this;
+      return target.split(search).join(replacement);
+    };
+
+    let vizObjects = document.querySelectorAll('.graphviz')
+
+    for (let item of vizObjects) {
+      let svg = undefined
+      try {
+        svg = Viz(item.textContent.replaceAll('–', '--'), 'svg')
+      } catch(e) {
+        svg = `<pre class="error">${e}</pre>`
+      }
+      item.outerHTML = svg
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

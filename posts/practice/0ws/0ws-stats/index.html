@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/16.png?v=7.3.0">
+  <link rel="mask-icon" href="/32.png?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false,"width":240},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="统计和监控可以让你对产品了如指掌，进而看清未来发展方向。">
+<meta name="keywords" content="Web">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【互联网产品的诞生和演化】统计数据收集展示和系统监控">
+<meta property="og:url" content="https://blog.mapleque.com/posts/practice/0ws/0ws-stats/index.html">
+<meta property="og:site_name" content="枫枝雀自鸣">
+<meta property="og:description" content="统计和监控可以让你对产品了如指掌，进而看清未来发展方向。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-26T04:25:47.194Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【互联网产品的诞生和演化】统计数据收集展示和系统监控">
+<meta name="twitter:description" content="统计和监控可以让你对产品了如指掌，进而看清未来发展方向。">
+  <link rel="alternate" href="/atom.xml" title="枫枝雀自鸣" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.mapleque.com/posts/practice/0ws/0ws-stats/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>【互联网产品的诞生和演化】统计数据收集展示和系统监控 | 枫枝雀自鸣</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e0fc945f04e1f73b09770bf9d28d0627";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <!--<span class="logo-line-before"><i></i></span>-->
+        <span class="site-title">枫枝雀自鸣</span>
+        <!--<span class="logo-line-after"><i></i></span>-->
+      </a>
+    </div>
+        <p class="site-subtitle">技术博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a class="book-mark-link book-mark-link-fixed" href="#"></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://blog.mapleque.com/posts/practice/0ws/0ws-stats/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="枫雀">
+      <meta itemprop="description" content="技术经验积累。">
+      <meta itemprop="image" content="/500.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="枫枝雀自鸣">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">【互联网产品的诞生和演化】统计数据收集展示和系统监控
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-11 14:57:09" itemprop="dateCreated datePublished" datetime="2019-12-11T14:57:09+08:00">2019-12-11</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-26 12:25:47" itemprop="dateModified" datetime="2020-02-26T12:25:47+08:00">2020-02-26</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/practice/" itemprop="url" rel="index"><span itemprop="name">实践</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/practice/0ws/" itemprop="url" rel="index"><span itemprop="name">互联网产品的诞生和演化</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <div class="post-description">统计和监控可以让你对产品了如指掌，进而看清未来发展方向。</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>互联网产品在线上之前，就要考虑统计数据和监控。</p>
+<p>初期，为了节省成本，数据统计可以直接使用第三方平台提供的服务，如：百度统计、谷歌统计等。</p>
+<p>这些第三方平台提供了丰富多彩的统计服务，唯一缺陷就是数据在第三方，我们自己无法随心所欲使用数据，只能受限于第三方可用功能。</p>
+<p>系统监控可以考虑直接监控服务器错误日志。</p>
+<p>当第三方数据服务已经无法满足我们的要求时，就需要考虑自建数据平台了。</p>
+<p>一个典型的数据平台架构如下：</p>
+<pre class="mermaid" style="text-align: center;">
+            graph LR
+            source[数据源]
+collection[数据收集]
+storage[数据存储]
+analysis[数据分析]
+showing[数据展示]
+
+source --> collection
+collection --> storage
+storage --> analysis
+analysis --> storage
+storage --> showing
+          </pre>
+<p>这里边，数据存储是核心。</p>
+<h2 id="数据存储"><a class="markdownIt-Anchor" href="#数据存储"></a> 数据存储</h2>
+<p>影响数据存储选型的因素有很多，需要重点考虑的核心因素有三：</p>
+<ul>
+<li>数据规模</li>
+<li>数据结构</li>
+<li>数据使用方式</li>
+</ul>
+<p>对于不同的选型，上述三个因素的取舍各不相同：</p>
+<ul>
+<li>
+<p>MySQL</p>
+<p>MySQL是互联网时代最常用的数据库之一，适用于100w数量级以下的结构化数据存储，使用SQL操作数据，通常用于存储业务数据和展示数据。<br>
+在数据平台中，如果总数据量不大，并且增长不快，可以直接使用MySQL作为数据存储，这种存储的使用成本应该是最低的。</p>
+</li>
+<li>
+<p>HDFS</p>
+<p>HDFS是Hadoop架构下的分布式文件存储系统，适用于100w数据级以上的数据存储，使用MapReduce查询数据或通过上层中间件（如：HBase，HIVE，Spark等）操作数据，通常应用于离线数据计算和查询。<br>
+在数据平台中，使用HDFS至少需要3个节点以上的集群进行部署，同时还要部署和维护所需中间件以及数据访问权限，运维复杂度极高，非专业团队不建议使用。</p>
+</li>
+<li>
+<p>Elasticsearch</p>
+<p>Elasticsearch是ElasticStack中的基于Luence实现的搜索引擎，得益于其高效的全文搜索功能和数据统计功能，也可以将其用作数据平台的一种存储。<br>
+结合使用Kibana，可以将其作为系统监控的核心系统。<br>
+Kibana通过封装Elasticsearch的api，实现了数据查询、聚集以及可视化展示等功能，并且支持按条件触发事件和发送报告。<br>
+由于其基于Luence实现，因此不适合作为复杂的数据分析工具使用，强行使用会影响系统稳定性。</p>
+</li>
+<li>
+<p>TiDB</p>
+<p>TiDB是PingCAP开发的一款支持MySQL协议，并且可以水平扩展的分布式关系数据库。<br>
+由于其对MySQL协议的支持，大大降低了使用成本和维护成本。<br>
+其在大数据量下的表现有待考量，据笔者经验，在亿级数据量下复杂分组查询可以实现秒级返回。</p>
+</li>
+<li>
+<p>Kafka</p>
+<p>Kafka可以被看作实时一种数据存储，由于流计算需求的存在，使得Kafka成为一个不可替代的存储选型。</p>
+</li>
+</ul>
+<p>事实上，在实际应用中，根据不同需求，可以将不同存储组合使用。例如：</p>
+<ul>
+<li>将需要展示的数据，计算后存储到MySQL中</li>
+<li>将冷数据归档到HDFS中</li>
+<li>在Elasticsearch中仅保留一定规模的热数据用于问题跟踪和系统监控</li>
+<li>TiDB仅用于数据分析，不用于业务服务和数据展示</li>
+</ul>
+<h2 id="数据源"><a class="markdownIt-Anchor" href="#数据源"></a> 数据源</h2>
+<p>从技术角度来讲，统计和监控都依赖于日志数据的收集和汇总，所需的日志通常有：</p>
+<ul>
+<li>前端和客户端行为打点日志</li>
+<li>前端和客户端错误上报日志</li>
+<li>后端接口请求日志</li>
+<li>后端异常错误日志</li>
+<li>探针日志</li>
+</ul>
+<p>以上日志，都可以作为数据源进行收集，并进一步处理。</p>
+<h2 id="数据收集"><a class="markdownIt-Anchor" href="#数据收集"></a> 数据收集</h2>
+<p>由于我们的数据源都是日志，因此可以使用filebeat部署到日志服务器进行收集。</p>
+<p>这里建议filebeat的消费端使用Kafka以使服务器的filebeat不发生阻塞也不需要回滚。</p>
+<div class="note warning">
+            <p>注意：logstash非常耗费资源，如果资源并出充足，建议自行脚本实现从Kafka消费到数据存储的流程。</p>
+          </div>
+<p>filebeat的安装命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-6.3.1-amd64.deb</span><br><span class="line">sudo dpkg -i filebeat-6.3.1-amd64.deb</span><br><span class="line">sudo systemctl start filebeat</span><br><span class="line">sudo systemctl <span class="built_in">enable</span> filebeat</span><br></pre></td></tr></table></figure>
+<p>filebeat的配置示例如下：</p>
+<figure class="highlight yaml"><figcaption><span>/etc/filebeat/filebeat.yml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">filebeat.prospectors:</span></span><br><span class="line"><span class="comment"># 根据情况自行配置需要收集哪些log</span></span><br><span class="line"><span class="attr">- type:</span> <span class="string">log</span></span><br><span class="line"><span class="attr">  paths:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">&lt;log_path&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="string">output.kafka:</span></span><br><span class="line"><span class="attr">  enable:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">  hosts:</span> <span class="string">['&lt;kafka_ip&gt;']</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  topic:</span> <span class="string">'&lt;string&gt;'</span></span><br><span class="line"><span class="attr">  compression:</span> <span class="string">gzip</span></span><br><span class="line"><span class="attr">  max_message_bytes:</span> <span class="number">1000000</span></span><br><span class="line"></span><br><span class="line"><span class="string">queue.mem:</span></span><br><span class="line"><span class="attr">  events:</span> <span class="number">512</span></span><br><span class="line">  <span class="string">flush.min_events:</span> <span class="number">256</span></span><br><span class="line">  <span class="string">flush.timeout:</span> <span class="number">5</span><span class="string">s</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 监控可不配置</span></span><br><span class="line"><span class="string">xpack.monitoring:</span></span><br><span class="line"><span class="attr">  enabled:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">  elasticsearch:</span></span><br><span class="line"><span class="attr">    hosts:</span> <span class="string">["&lt;es_ip&gt;"]</span></span><br><span class="line"><span class="attr">    username:</span> <span class="string">&lt;string&gt;</span></span><br><span class="line"><span class="attr">    password:</span> <span class="string">"&lt;string&gt;"</span></span><br></pre></td></tr></table></figure>
+<h2 id="数据分析"><a class="markdownIt-Anchor" href="#数据分析"></a> 数据分析</h2>
+<p>数据分析是对现有数据的再加工过程，通常涉及：变形，关联，统计等。目前最适合进行数据分析的语言应该是Python，上文中的数据存储，都可以原生支持Python。</p>
+<h2 id="数据展示"><a class="markdownIt-Anchor" href="#数据展示"></a> 数据展示</h2>
+<p>数据展示的基本形式是图表，图可以将数据特征更直观的展示出来，<a href="https://github.com/antvis/G2Plot" target="_blank" rel="noopener">G2Plot</a>提供了图表的完整封装，通过简单的前端项目构建和后端接口查询，即可做到优雅的数据可视化展示。</p>
+<p>注意，不要在数据展示期间进行数据计算。</p>
+<p>当然，想要展示实时数据，可以考虑尝试使用TiDB。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>枫雀</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.mapleque.com/posts/practice/0ws/0ws-stats/" title="【互联网产品的诞生和演化】统计数据收集展示和系统监控">https://blog.mapleque.com/posts/practice/0ws/0ws-stats/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Web/" rel="tag"><i class="fa fa-tag"></i> Web</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/posts/practice/0ws/0ws-base/" rel="next" title="【互联网产品的诞生和演化】独立应用的基本架构">
+                  <i class="fa fa-chevron-left"></i> 【互联网产品的诞生和演化】独立应用的基本架构
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/posts/practice/0ws/0ws-cicd/" rel="prev" title="【互联网产品的诞生和演化】快速迭代和持续集成">
+                  【互联网产品的诞生和演化】快速迭代和持续集成 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据存储"><span class="nav-number">1.</span> <span class="nav-text"> 数据存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据源"><span class="nav-number">2.</span> <span class="nav-text"> 数据源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据收集"><span class="nav-number">3.</span> <span class="nav-text"> 数据收集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据分析"><span class="nav-number">4.</span> <span class="nav-text"> 数据分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据展示"><span class="nav-number">5.</span> <span class="nav-text"> 数据展示</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/500.png"
+      alt="枫雀">
+  <p class="site-author-name" itemprop="name">枫雀</p>
+  <div class="site-description" itemprop="description">技术经验积累。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/mapleque" title="GitHub &rarr; https://github.com/mapleque" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:mapleque@163.com" title="E-Mail &rarr; mailto:mapleque@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+<a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">京ICP备16041918号 </a>
+  <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=" rel="noopener" target="_blank"> </a>&copy; 2013 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mapleque.com</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+<script src="/js/next-boot.js?v=7.3.0"></script><script src="/js/bookmark.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/viz.js/1.7.1/viz.js'></script>
+  <script>
+    String.prototype.replaceAll = function(search, replacement) {
+      var target = this;
+      return target.split(search).join(replacement);
+    };
+
+    let vizObjects = document.querySelectorAll('.graphviz')
+
+    for (let item of vizObjects) {
+      let svg = undefined
+      try {
+        svg = Viz(item.textContent.replaceAll('–', '--'), 'svg')
+      } catch(e) {
+        svg = `<pre class="error">${e}</pre>`
+      }
+      item.outerHTML = svg
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

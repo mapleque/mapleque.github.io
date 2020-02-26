@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/16.png?v=7.3.0">
+  <link rel="mask-icon" href="/32.png?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false,"width":240},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="讲述一套基于kubernates实现的微服务架构方案">
+<meta name="keywords" content="Kubernates">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于kubernates实现高可用微服务架构">
+<meta property="og:url" content="https://blog.mapleque.com/posts/practice/ms/k8s/index.html">
+<meta property="og:site_name" content="枫枝雀自鸣">
+<meta property="og:description" content="讲述一套基于kubernates实现的微服务架构方案">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-26T04:25:47.197Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于kubernates实现高可用微服务架构">
+<meta name="twitter:description" content="讲述一套基于kubernates实现的微服务架构方案">
+  <link rel="alternate" href="/atom.xml" title="枫枝雀自鸣" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.mapleque.com/posts/practice/ms/k8s/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>基于kubernates实现高可用微服务架构 | 枫枝雀自鸣</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e0fc945f04e1f73b09770bf9d28d0627";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <!--<span class="logo-line-before"><i></i></span>-->
+        <span class="site-title">枫枝雀自鸣</span>
+        <!--<span class="logo-line-after"><i></i></span>-->
+      </a>
+    </div>
+        <p class="site-subtitle">技术博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a class="book-mark-link book-mark-link-fixed" href="#"></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://blog.mapleque.com/posts/practice/ms/k8s/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="枫雀">
+      <meta itemprop="description" content="技术经验积累。">
+      <meta itemprop="image" content="/500.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="枫枝雀自鸣">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">基于kubernates实现高可用微服务架构
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-29 14:15:05" itemprop="dateCreated datePublished" datetime="2019-08-29T14:15:05+08:00">2019-08-29</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-26 12:25:47" itemprop="dateModified" datetime="2020-02-26T12:25:47+08:00">2020-02-26</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/practice/" itemprop="url" rel="index"><span itemprop="name">实践</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/practice/ms/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <div class="post-description">讲述一套基于kubernates实现的微服务架构方案</div>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote><p>Kubernetes (K8s) is an open-source system for automating deployment, scaling, and management of containerized applications.</p>
+<footer><strong>kubernates</strong><cite><a href="https://kubernetes.io/" target="_blank" rel="noopener">kubernetes.io</a></cite></footer></blockquote>
+<p>本文主要讲述如何部署一个用于web服务的高可用kubernates集群。该架构能够较好的适用于微服务体系，内置的服务发现机制给微服务治理带来了极佳的体验。</p>
+<h2 id="集群架构"><a class="markdownIt-Anchor" href="#集群架构"></a> 集群架构</h2>
+<p>话不多说，架构图如下：</p>
+<div><div class="graphviz">digraph G {
+    rankdir="TB"
+    rank="same"
+    node [
+        shape="box"
+        style="filled"
+    ]
+<pre><code>subgraph cluster_node0 {
+    label=&quot;(2+)* master or slave&quot;
+    ex_proxy[label=&quot;proxy&quot;,fillcolor=&quot;red&quot;]
+    in_proxy[label=&quot;proxy&quot;,fillcolor=&quot;red&quot;]
+    controller1[label=&quot;kube-controller&quot;,fillcolor=&quot;gray&quot;]
+    scheduler1[label=&quot;kube-scheduler&quot;,fillcolor=&quot;gray&quot;]
+}
+in_proxy-&gt;apiserver1[label=watch,dir=both]
+
+subgraph cluster_node1 {
+    label=&quot;3*master&quot;
+
+    weave1[label=&quot;weave&quot;,fillcolor=&quot;gray&quot;]
+
+    kubelet1[label=&quot;kubelet&quot;,fillcolor=&quot;gray&quot;]
+
+    apiserver1[label=&quot;kube-apiserver&quot;,fillcolor=&quot;red&quot;]
+    etcd1[label=&quot;etcd&quot;,fillcolor=&quot;red&quot;]
+
+    apiserver1-&gt;etcd1
+}
+subgraph cluster_node2 {
+    label=&quot;n*slave&quot;
+
+    weave2[label=&quot;weave&quot;,fillcolor=&quot;gray&quot;]
+
+    kubelet2[label=&quot;kubelet&quot;,fillcolor=&quot;gray&quot;]
+    pods2[label=&quot;pod ...&quot;,fillcolor=&quot;white&quot;]
+}
+
+ex_request[label=外网请求,shape=none,style=empty]
+in_request[label=内网请求,shape=none,style=empty]
+
+ex_request -&gt; ex_proxy[style=dashed,label=req]
+in_request -&gt; in_proxy[style=dashed,label=req]
+ex_proxy -&gt; in_proxy[style=dashed,label=req]
+in_proxy-&gt;pods2[style=dashed,label=req]
+
+in_proxy-&gt;pods2[label=&quot;health check&quot;]
+</code></pre>
+<p>}</p></div></div><p></p>
+<p>这里，我们把集群相关服务分了三类：</p>
+<ul>
+<li>必须部署在master上的服务</li>
+<li>必须部署在slave上的服务</li>
+<li>master和slave都可以部署的服务</li>
+</ul>
+<p>其中，kubelet和weave是集群内每台机器必须部署的服务，无需过多研究。</p>
+<p>kube-shceduler和kube-controller主要用于集群管理，正常部署即可。</p>
+<p>kube-apiserver和etcd是集群master核心，简单来说，集群所有相关服务都需要通过和apiserver通信来控制集群行为。</p>
+<p>用户所需要部署的服务都运行在slave的pod中。</p>
+<p>以上服务都部署完成后，集群就可以正常运行了。那么用户的服务如何被请求到，是接下来要解决的重要问题。</p>
+<h2 id="微服务治理"><a class="markdownIt-Anchor" href="#微服务治理"></a> 微服务治理</h2>
+<p>所谓微服务治理，笔者认为主要是管理当前已经部署的那些服务如何被请求到。</p>
+<p>kubernate本身提供了kube-proxy和service用于提供所部署服务的请求方案。基于这个方案，能够实现服务的正常访问，甚至还提供了负载均衡。但是在实践过程中总会发现一些问题，较难处理：</p>
+<ul>
+<li>
+<p>如何方便快速的告诉服务使用方怎么请求我的服务？<br>
+事实上，当你新上线一个服务时，你需要从全局获取一个可用端口，然后用这个端口部署你的服务，然后告诉服务使用方带端口请求kube-proxy。</p>
+</li>
+<li>
+<p>负载均衡能否做到高可用？<br>
+kube-proxy实现了负载均衡，能够让请求均匀的发送到不同的实例。然而，当实际部署实例的一个节点出问题的时候，kube-proxy并不能立即知道这个问题，也就不能够及时摘掉问题节点。这个时候你会发现，这样的效果跟直接部署在几台机器上没什么区别。</p>
+</li>
+<li>
+<p>如何请求到指定实例，如何让两次请求请求到同一个实例？<br>
+由于机制和理念问题，这个做不到。</p>
+</li>
+</ul>
+<p>如此一来，如果使用该方案，那么就不得不再单独设计服务治理以及高可用负载均衡方案。也就是说，我们现在只能这么干。</p>
+<p>在上面的架构图中，proxy<a href="https://github.com/mapleque/proxy" target="_blank" rel="noopener">Code on Github</a>就是这样一个提供了服务发现和高可用负载均衡的服务。</p>
+<p>本质上讲，proxy是一个完整的反向代理服务，如果你熟悉nginx，那么结合lua脚本的开发，也可以做到proxy所做的事情：增加一个上游服务的自定义健康检查功能。</p>
+<p>此外，proxy还实现了一个通过请求kube-apiserver接口，来监控集群变化，进而更新proxy配置的插件。</p>
+<p>使用该插件，用户需要定义：</p>
+<ul>
+<li>部署项目名</li>
+<li>项目服务端口名到端口的映射</li>
+</ul>
+<p>通过上面两项，可以按照规则生成当前项目的一些列域名，每个域名都可以被代理到对应的端口，即实现了约定式的服务发现。</p>
+<h2 id="日志收集"><a class="markdownIt-Anchor" href="#日志收集"></a> 日志收集</h2>
+<p>通过在每个slave节点上创建日志目录，并将其默认挂载到所有pods的docker上，只要服务的日志都输出到指定路径，即可统一被slave机器上的filebeat收集到日志服务器。</p>
+<h2 id="集群监控"><a class="markdownIt-Anchor" href="#集群监控"></a> 集群监控</h2>
+<p>通过收集proxy的健康检查日志，可以实现实时集群监控。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>枫雀</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.mapleque.com/posts/practice/ms/k8s/" title="基于kubernates实现高可用微服务架构">https://blog.mapleque.com/posts/practice/ms/k8s/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Kubernates/" rel="tag"><i class="fa fa-tag"></i> Kubernates</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/posts/tool/gitlab/gitlab-ci/" rel="next" title="使用gitlab持续集成部署">
+                  <i class="fa fa-chevron-left"></i> 使用gitlab持续集成部署
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/posts/tool/elk/elk-monitor/" rel="prev" title="通过日志实现监控和报警">
+                  通过日志实现监控和报警 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#集群架构"><span class="nav-number">1.</span> <span class="nav-text"> 集群架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#微服务治理"><span class="nav-number">2.</span> <span class="nav-text"> 微服务治理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志收集"><span class="nav-number">3.</span> <span class="nav-text"> 日志收集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群监控"><span class="nav-number">4.</span> <span class="nav-text"> 集群监控</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/500.png"
+      alt="枫雀">
+  <p class="site-author-name" itemprop="name">枫雀</p>
+  <div class="site-description" itemprop="description">技术经验积累。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/mapleque" title="GitHub &rarr; https://github.com/mapleque" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:mapleque@163.com" title="E-Mail &rarr; mailto:mapleque@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+<a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">京ICP备16041918号 </a>
+  <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=" rel="noopener" target="_blank"> </a>&copy; 2013 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mapleque.com</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+<script src="/js/next-boot.js?v=7.3.0"></script><script src="/js/bookmark.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/viz.js/1.7.1/viz.js'></script>
+  <script>
+    String.prototype.replaceAll = function(search, replacement) {
+      var target = this;
+      return target.split(search).join(replacement);
+    };
+
+    let vizObjects = document.querySelectorAll('.graphviz')
+
+    for (let item of vizObjects) {
+      let svg = undefined
+      try {
+        svg = Viz(item.textContent.replaceAll('–', '--'), 'svg')
+      } catch(e) {
+        svg = `<pre class="error">${e}</pre>`
+      }
+      item.outerHTML = svg
+    }
+  </script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
